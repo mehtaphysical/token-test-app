@@ -24,7 +24,7 @@ function App() {
         }))
       )
     );
-  }, [tokenIds, wallet]);
+  }, [...tokenIds, wallet]);
 
   const mint = (token) => {
     return wallet.account().functionCall(token.id, "mint", {
