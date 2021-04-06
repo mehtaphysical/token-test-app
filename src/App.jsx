@@ -1,9 +1,10 @@
-import { Button, TextField } from "@material-ui/core";
+import { useEffect, useState } from "react";
+import { Button, TextField, Grid } from "@material-ui/core";
 import { useNearWallet } from "near-react-hooks";
-import { useEffect } from "react";
 
 function App() {
-  const tokenIds = ["usdc"];
+  const tokenIds = ["usdc", "banana", "avocado"];
+  const [tokenData, setTokenData] = useState([]);
 
   const wallet = useNearWallet();
 
@@ -15,18 +16,32 @@ function App() {
           amount: "1000",
         })
       )
-    ).then(console.log);
+    ).then((tokens) =>
+      setTokenData(
+        tokens.map((token, i) => ({
+          ...token,
+          id: `${tokenIds[i]}.ft-fin.testnet`,
+        }))
+      )
+    );
   }, []);
+
+  const mint = (token) => {
+    return wallet.account().functionCall(token.id, "mint", {
+      account_id: wallet.getAccountId(),
+      amount: document.getElementById(token.id).value,
+    });
+  };
 
   const handleMintAll = () => {
     Promise.all(
-      tokenIds.map((id) =>
-        wallet.account().functionCall(`${id}.ft-fin.testnet`, "mint", {
+      tokenData.map((token) =>
+        wallet.account().functionCall(token.id, "mint", {
           account_id: wallet.getAccountId(),
-          amount: "1000",
+          amount: document.getElementById(token.id).value,
         })
       )
-    ).then(console.log);
+    );
   };
 
   if (!wallet.isSignedIn())
@@ -41,8 +56,31 @@ function App() {
     );
 
   return (
-    <form>
-      <TextField label="nUSDC" />
+    <form style={{ width: "20rem", margin: "auto" }}>
+      {tokenData.map((token) => (
+        <Grid
+          container
+          direction="row"
+          justify="flex-start"
+          alignItems="center"
+        >
+          <img
+            src={token.icon}
+            style={{ width: "3rem", marginRight: "1rem" }}
+          />
+          <TextField id={token.id} label={token.symbol} />
+          <Button onClick={() => mint(token)}>+</Button>
+        </Grid>
+      ))}
+      <Button
+        variant="contained"
+        size="large"
+        color="primary"
+        onClick={handleMintAll}
+        style={{ display: "block", margin: "2rem auto" }}
+      >
+        Mint All
+      </Button>
     </form>
   );
 }
