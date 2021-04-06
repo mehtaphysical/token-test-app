@@ -24,7 +24,7 @@ function App() {
         }))
       )
     );
-  }, []);
+  }, [tokenIds, wallet]);
 
   const mint = (token) => {
     return wallet.account().functionCall(token.id, "mint", {
@@ -66,6 +66,7 @@ function App() {
         >
           <img
             src={token.icon}
+            alt={token.name}
             style={{ width: "3rem", marginRight: "1rem" }}
           />
           <TextField id={token.id} label={token.symbol} />
