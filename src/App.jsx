@@ -3,7 +3,7 @@ import { Button, TextField, Grid } from "@material-ui/core";
 import { useNearWallet } from "near-react-hooks";
 
 function App() {
-  const tokenIds = ["usdc", "banana", "avocado"];
+  const tokenIds = ["nusdc", "nusdt", "ndai", "nweth", "banana", "avocado"];
   const [tokenData, setTokenData] = useState([]);
 
   const wallet = useNearWallet();
@@ -31,17 +31,6 @@ function App() {
       account_id: wallet.getAccountId(),
       amount: document.getElementById(token.id).value,
     });
-  };
-
-  const handleMintAll = () => {
-    Promise.all(
-      tokenData.map((token) =>
-        wallet.account().functionCall(token.id, "mint", {
-          account_id: wallet.getAccountId(),
-          amount: document.getElementById(token.id).value,
-        })
-      )
-    );
   };
 
   if (!wallet.isSignedIn())
@@ -73,15 +62,6 @@ function App() {
           <Button onClick={() => mint(token)}>+</Button>
         </Grid>
       ))}
-      <Button
-        variant="contained"
-        size="large"
-        color="primary"
-        onClick={handleMintAll}
-        style={{ display: "block", margin: "2rem auto" }}
-      >
-        Mint All
-      </Button>
     </form>
   );
 }
